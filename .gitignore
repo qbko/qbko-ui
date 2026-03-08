@@ -42,4 +42,6 @@ yarn-error.*
 
 # misc
 .cursorrules
-documents/
+
+# documentation
+doc/
