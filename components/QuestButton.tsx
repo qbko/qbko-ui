@@ -4,6 +4,9 @@ interface QuestButtonProps {
   onPress: () => void;
 }
 
+// This component needs a file prop. It is needed so we can reference to the file
+// from the context Provider we are going to create.
+
 export default function QuestButton({ onPress }: QuestButtonProps) {
   return (
     <View style={styles.buttonContainer}>
@@ -16,17 +19,18 @@ export default function QuestButton({ onPress }: QuestButtonProps) {
 
 const styles = StyleSheet.create({
   buttonContainer: {
-    width: 108,
-    height: 64,
+    width: 88,
+    height: 80,
     marginHorizontal: 12,
     alignItems: "center",
     justifyContent: "center",
   },
   button: {
-    backgroundColor: "#2B70C9",
-    borderRadius: 16,
+    scaleY: 0.6,
+    backgroundColor: "#0080FF",
+    borderRadius: 50,
     width: "100%",
-    height: "100%",
+    height: 80,
     alignItems: "center",
     justifyContent: "center",
     flexDirection: "row",
