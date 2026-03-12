@@ -1,6 +1,6 @@
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, View } from "react-native";
-import SkiaButton from "./components/SkiaButton";
+import QuestButton from "./components/QuestButton";
 
 export default function App() {
   const handlePress = () => {
@@ -10,7 +10,7 @@ export default function App() {
   return (
     <View style={styles.container}>
       <StatusBar style="auto" />
-      <SkiaButton onPress={handlePress} />
+      <QuestButton onPress={handlePress} />
     </View>
   );
 }
