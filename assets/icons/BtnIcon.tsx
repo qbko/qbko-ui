@@ -2,43 +2,26 @@ import { useMemo } from "react";
 import { Path, Skia, Oval, Canvas, Group } from "@shopify/react-native-skia";
 
 export const BtnIcon = ({ isFocused }: { isFocused: boolean }) => {
-  //defining the base shape one time
-  const bottomShape = useMemo(() => {
+  const myPath = useMemo(() => {
     return Skia.Path.MakeFromSVGString(
-      "M0 0 L0 1.87769 C0 4.5 3.02202 6.99959 6.49952 6.99976 C9.9772 6.99976 13 4.5 13 1.87769 L13 0 Z",
+      "M22 11C22 15.9706 17.0751 20 11 20C4.92487 20 0 15.9706 0 11V9H22V11Z",
     );
   }, []);
 
-  // defining the coordinates for each tiny icons
-  const layers = [
-    { x: 0, y: 0 },
-    { x: 17, y: 9 },
-    { x: 0, y: 18 },
-  ];
-
   return (
-    <Canvas style={{ width: 30, height: 30 }} pointerEvents="none">
-      {layers.map((offset, index) => (
-        <Group
-          key={index}
-          transform={[{ translateX: offset.x }, { translateY: offset.y }]}
-        >
-          {bottomShape && (
-            <Path
-              path={bottomShape}
-              color={isFocused ? "#0064C7" : "#8D8F91"}
-              transform={[{ translateY: 5 }]}
-            />
-          )}
-          <Oval
-            x={0}
-            y={0}
-            width={13}
-            height={10.8}
-            color={isFocused ? "#0080FF" : "#8D8F91"}
-          />
-        </Group>
-      ))}
+    <Canvas style={{ width: 24, height: 24 }} pointerEvents="none">
+      <Group transform={[{ translateX: 1 }, { translateY: 2 }]}>
+        {myPath && (
+          <Path path={myPath} color={isFocused ? "#0064C7" : "#8D8F91"} />
+        )}
+        <Oval
+          x={0}
+          y={0}
+          width={22}
+          height={18}
+          color={isFocused ? "#0080FF" : "#A1A3A5"}
+        />
+      </Group>
     </Canvas>
   );
 };
