@@ -2,6 +2,7 @@ import { View, StyleSheet, Pressable, Text } from "react-native";
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 
 import { ListViewIcon } from "../assets/icons/ListViewIcon";
+import { BtnIcon } from "../assets/icons/BtnIcon";
 
 export default function BottomNav({
   state,
@@ -13,7 +14,7 @@ export default function BottomNav({
 
   //Mapping the icons onto my route
   const ICON_MAP: Record<string, React.FC<{ isFocused: boolean }>> = {
-    //index: TODO
+    index: BtnIcon,
     detail: ListViewIcon,
   };
 
