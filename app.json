@@ -39,13 +39,15 @@
             "deploymentTarget": "15.1"
           }
         }
-      ]
+      ],
+      "expo-router"
     ],
     "extra": {
       "eas": {
         "projectId": "38fb84af-ae9a-4aaf-a2d1-02be239d7a8d"
       }
     },
-    "owner": "qbko-ke"
+    "owner": "qbko-ke",
+    "scheme": "qbko-ui"
   }
 }

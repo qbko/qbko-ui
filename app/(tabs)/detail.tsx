@@ -1,15 +1,13 @@
-import { StatusBar } from "expo-status-bar";
 import { StyleSheet, View } from "react-native";
-import QuestButton from "./components/QuestButton";
+import QuestButton from "../../components/QuestButton";
 
-export default function App() {
+export default function DetailScreen() {
   const handlePress = () => {
-    console.log("button pressed, yo!");
+    console.log("hii, pressed!");
   };
 
   return (
     <View style={styles.container}>
-      <StatusBar style="auto" />
       <QuestButton onPress={handlePress} />
     </View>
   );
