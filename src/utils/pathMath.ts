@@ -1,38 +1,56 @@
-//So we are exporting a function here
+export interface NodeLayout {
+  offsetX: number;
+  rowHeight: number;
+}
 
-export const getButtonOffset = (
-  lessonNumber: number,
-  totalLesson: number,
-  baseAmplitude: number = 100,
-): number => {
-  const IDEAL_SEGMENTS = 4;
-  const currentSegment = lessonNumber - 1;
-  const totalSegments = totalLesson - 1;
+const SEGMENTS_PER_HUMP = 4;
+const MIN_ROW_HEIGHT = 90;
 
-  if (totalSegments <= 0) return 0;
+export function computeUnitLayout(
+  totalLessons: number,
+  amplitude: number = 100,
+): NodeLayout[] {
+  if (totalLessons <= 1) {
+    return [{ offsetX: 0, rowHeight: MIN_ROW_HEIGHT }];
+  }
 
-  // 1. Find which "hump" we are in
-  const humpIndex = Math.floor(currentSegment / IDEAL_SEGMENTS);
+  const totalSegments = totalLessons - 1;
+  const numHumps = Math.max(1, Math.round(totalSegments / SEGMENTS_PER_HUMP));
 
-  // 2. Determin the boundaries of this specific hump
-  const humpStart = humpIndex * IDEAL_SEGMENTS;
-  //Is this the very last hump in the unit?
-  const isLastHump = humpIndex === Math.floor(totalSegments / IDEAL_SEGMENTS);
-  const humpEnd = isLastHump ? totalSegments : humpStart + IDEAL_SEGMENTS;
+  const xOffsets: number[] = [];
+  for (let i = 0; i < totalLessons; i++) {
+    //This outcome is radian, basically measure the angular progression on a sine curve.
+    const theta = (i / totalSegments) * numHumps * Math.PI;
+    xOffsets.push(amplitude * Math.sin(theta));
+  }
 
-  const humpLength = humpEnd - humpStart;
-  if (humpLength <= 0) return 0;
+  //This is here to find out the largest gap
+  let maxDx = 0;
+  for (let i = 0; i < totalSegments; i++) {
+    maxDx = Math.max(maxDx, Math.abs(xOffsets[i + 1] - xOffsets[i]));
+  }
 
-  // 3. Local Progress within the hump
-  const localProgress = (currentSegment - humpStart) / humpLength;
+  //Now we have the minimum row height, and the gap on the x-axis
+  // with basic pythagorean theorem we can calculate the target distance between the nodes
+  const targetDistance = Math.sqrt(
+    MIN_ROW_HEIGHT * MIN_ROW_HEIGHT + maxDx * maxDx,
+  );
 
-  // 4. Dynamic Amplitude Recalibration
-  // This will achieve the smaller amplitude for shorter hump and large amplitude for bigger hump
-  const dynamicAmplitude = baseAmplitude * (humpLength / IDEAL_SEGMENTS);
+  // Since now we have the target distance, and the xOffset already, again, using the same trigonometry formula
+  // we can calculate the the final row height
+  const layout: NodeLayout[] = [];
+  for (let i = 0; i < totalLessons; i++) {
+    let rowHeight: number;
 
-  // 5. Calculate Sine with alternating direction
-  const direction = humpIndex % 2 === 0 ? 1 : -1;
-  const offsetMultiplier = Math.sin(localProgress * Math.PI);
+    if (i < totalLessons - 1) {
+      const dx = xOffsets[i + 1] - xOffsets[i];
+      rowHeight = Math.sqrt(targetDistance * targetDistance - dx * dx);
+    } else {
+      rowHeight = targetDistance;
+    }
 
-  return offsetMultiplier * dynamicAmplitude * direction;
-};
+    layout.push({ offsetX: xOffsets[i], rowHeight });
+  }
+
+  return layout;
+}
