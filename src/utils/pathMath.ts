@@ -1,6 +1,7 @@
 export interface NodeLayout {
   offsetX: number;
   rowHeight: number;
+  peakDirection: "left" | "right" | null;
 }
 
 const SEGMENTS_PER_HUMP = 4;
@@ -11,7 +12,7 @@ export function computeUnitLayout(
   amplitude: number = 100,
 ): NodeLayout[] {
   if (totalLessons <= 1) {
-    return [{ offsetX: 0, rowHeight: MIN_ROW_HEIGHT }];
+    return [{ offsetX: 0, rowHeight: MIN_ROW_HEIGHT, peakDirection: null }];
   }
 
   const totalSegments = totalLessons - 1;
@@ -49,7 +50,24 @@ export function computeUnitLayout(
       rowHeight = targetDistance;
     }
 
-    layout.push({ offsetX: xOffsets[i], rowHeight });
+    // Peak detection to inject characater element
+    let peakDirection: "left" | "right" | null = null;
+
+    // only check if nodes has neighbors, so not the first ot last
+    if (i > 0 && i < totalLessons - 1) {
+      const current = xOffsets[i];
+      const prev = xOffsets[i - 1];
+      const next = xOffsets[i + 1];
+
+      // right
+      if (current > prev && current > next) {
+        peakDirection = "right";
+      } else if (current < prev && current < next) {
+        peakDirection = "left";
+      }
+    }
+
+    layout.push({ offsetX: xOffsets[i], rowHeight, peakDirection });
   }
 
   return layout;
