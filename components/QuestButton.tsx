@@ -14,6 +14,7 @@ import {
   Rect,
   LinearGradient,
   vec,
+  RadialGradient,
 } from "@shopify/react-native-skia";
 import Animated, {
   useDerivedValue,
@@ -56,6 +57,18 @@ export default function QuestButton({ onPress }: QuestButtonProps) {
     return path;
   });
 
+  // I will make the highlight shapes as paths here
+  const xOffsetA = 20;
+  const yOffsetA = 88;
+  const highlightPathA = Skia.Path.MakeFromSVGString(
+    `M ${0 + xOffsetA} ${0 + yOffsetA} C ${0 + xOffsetA} ${0 + yOffsetA} ${11.92 + xOffsetA} ${7 + yOffsetA} ${25.3 + xOffsetA} ${7 + yOffsetA} S ${50.6 + xOffsetA} ${0 + yOffsetA} ${50.6 + xOffsetA} ${0 + yOffsetA} C ${43.45 + xOffsetA} ${5.04 + yOffsetA} ${34.72 + xOffsetA} ${9 + yOffsetA} ${25.3 + xOffsetA} ${9 + yOffsetA} S ${7.15 + xOffsetA} ${5.04 + yOffsetA} ${0 + xOffsetA} ${0 + yOffsetA} Z`,
+  );
+  const xOffsetB = 28;
+  const yOffsetB = 92;
+  const highlightPathB = Skia.Path.MakeFromSVGString(
+    `M ${0 + xOffsetB} ${0 + yOffsetB} C ${0 + xOffsetB} ${0 + yOffsetB} ${7.42 + xOffsetB} ${2.82 + yOffsetB} ${17.95 + xOffsetB} ${2.82 + yOffsetB} S ${35.9 + xOffsetB} ${0 + yOffsetB} ${35.9 + xOffsetB} ${0 + yOffsetB} C ${30.42 + xOffsetB} ${2.46 + yOffsetB} ${24.34 + xOffsetB} ${4.73 + yOffsetB} ${17.95 + xOffsetB} ${4.73 + yOffsetB} S ${5.48 + xOffsetB} ${2.46 + yOffsetB} ${0 + xOffsetB} ${0 + yOffsetB} Z`,
+  );
+
   //This is for the Group, the top surface of the button
   const groupTransform = useDerivedValue(() => [
     { translateY: pressedOffset.value },
@@ -66,6 +79,8 @@ export default function QuestButton({ onPress }: QuestButtonProps) {
       transform: [{ translateY: pressedOffset.value }],
     };
   });
+
+  // For the highlight, top surface light and shadow, TODO
 
   //Below is for the animation fine tuning
   const releaseHandling = (event: GestureResponderEvent) => {
@@ -97,8 +112,9 @@ export default function QuestButton({ onPress }: QuestButtonProps) {
     <View style={styles.buttonContainer}>
       <View style={styles.button}>
         <Canvas style={{ width: 90, height: 90 }}>
-          <Path path={animatedPath} color="#0064C7" />
+          <Path path={animatedPath} color={"#0064C7"} />
           <Group clip={animatedPath}>
+            {/* Here is the top of the button */}
             <Rect x={44} y={36} width={50} height={100} color="red">
               <LinearGradient
                 start={vec(44, 50)}
@@ -108,9 +124,51 @@ export default function QuestButton({ onPress }: QuestButtonProps) {
               />
             </Rect>
             <Group transform={groupTransform}>
-              <Oval x={0} y={10} width={88} height={72} color="#0080FF">
-                <Blur blur={2} />
+              <Oval x={1} y={8} width={88} height={72} color="#0080FF">
+                <Blur blur={1} />
               </Oval>
+              {/* Don't forget about the scaleY { scaleY: 0.804 } */}
+              <Group
+                transform={[{ translateY: 2 }, { scaleY: 0.804 }]}
+                opacity={0.66}
+              >
+                <Group
+                  transform={[{ rotate: Math.PI * 0 }]}
+                  origin={vec(45, 51)}
+                >
+                  {/* The group here is where the rotation will happen. */}
+                  <Oval
+                    x={45}
+                    y={13}
+                    width={40}
+                    height={40}
+                    color="blue"
+                  ></Oval>
+                  <Oval
+                    x={4}
+                    y={10}
+                    width={82}
+                    height={82}
+                    color="orange"
+                  ></Oval>
+                  {highlightPathA && (
+                    <Path
+                      path={highlightPathA}
+                      transform={[{ rotate: Math.PI / 5 }]}
+                      origin={vec(45, 51)}
+                      color="yellow"
+                    />
+                  )}
+                  {highlightPathB && (
+                    <Path
+                      path={highlightPathB}
+                      transform={[{ rotate: (Math.PI / 5) * -1 }]}
+                      origin={vec(45, 51)}
+                      color="yellow"
+                    />
+                  )}
+                </Group>
+              </Group>
             </Group>
           </Group>
         </Canvas>
@@ -143,6 +201,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 12,
     alignItems: "center",
     justifyContent: "flex-end",
+    backgroundColor: "#FF00004D",
   },
   button: {
     width: 90,
