@@ -14,6 +14,7 @@ import {
   Rect,
   LinearGradient,
   vec,
+  Blend,
   RadialGradient,
 } from "@shopify/react-native-skia";
 import Animated, {
@@ -29,6 +30,11 @@ import Animated, {
 interface QuestButtonProps {
   onPress: () => void;
 }
+
+// For the highlight, top surface light and shadow
+// Declaring the clipping mask for the top surface here
+const ovalMask = { x: 4, y: 10, width: 82, height: 82 };
+const surfaceClip = Skia.Path.Make().addOval(ovalMask);
 
 export default function QuestButton({ onPress }: QuestButtonProps) {
   const pressedOffset = useSharedValue(0);
@@ -58,13 +64,16 @@ export default function QuestButton({ onPress }: QuestButtonProps) {
   });
 
   // I will make the highlight shapes as paths here
+
   const xOffsetA = 20;
   const yOffsetA = 88;
+  //Bigger hightlight
   const highlightPathA = Skia.Path.MakeFromSVGString(
     `M ${0 + xOffsetA} ${0 + yOffsetA} C ${0 + xOffsetA} ${0 + yOffsetA} ${11.92 + xOffsetA} ${7 + yOffsetA} ${25.3 + xOffsetA} ${7 + yOffsetA} S ${50.6 + xOffsetA} ${0 + yOffsetA} ${50.6 + xOffsetA} ${0 + yOffsetA} C ${43.45 + xOffsetA} ${5.04 + yOffsetA} ${34.72 + xOffsetA} ${9 + yOffsetA} ${25.3 + xOffsetA} ${9 + yOffsetA} S ${7.15 + xOffsetA} ${5.04 + yOffsetA} ${0 + xOffsetA} ${0 + yOffsetA} Z`,
   );
   const xOffsetB = 28;
   const yOffsetB = 92;
+  // Smaller highlight
   const highlightPathB = Skia.Path.MakeFromSVGString(
     `M ${0 + xOffsetB} ${0 + yOffsetB} C ${0 + xOffsetB} ${0 + yOffsetB} ${7.42 + xOffsetB} ${2.82 + yOffsetB} ${17.95 + xOffsetB} ${2.82 + yOffsetB} S ${35.9 + xOffsetB} ${0 + yOffsetB} ${35.9 + xOffsetB} ${0 + yOffsetB} C ${30.42 + xOffsetB} ${2.46 + yOffsetB} ${24.34 + xOffsetB} ${4.73 + yOffsetB} ${17.95 + xOffsetB} ${4.73 + yOffsetB} S ${5.48 + xOffsetB} ${2.46 + yOffsetB} ${0 + xOffsetB} ${0 + yOffsetB} Z`,
   );
@@ -79,8 +88,6 @@ export default function QuestButton({ onPress }: QuestButtonProps) {
       transform: [{ translateY: pressedOffset.value }],
     };
   });
-
-  // For the highlight, top surface light and shadow, TODO
 
   //Below is for the animation fine tuning
   const releaseHandling = (event: GestureResponderEvent) => {
@@ -128,45 +135,50 @@ export default function QuestButton({ onPress }: QuestButtonProps) {
                 <Blur blur={1} />
               </Oval>
               {/* Don't forget about the scaleY { scaleY: 0.804 } */}
-              <Group
-                transform={[{ translateY: 2 }, { scaleY: 0.804 }]}
-                opacity={0.66}
-              >
-                <Group
-                  transform={[{ rotate: Math.PI * 0 }]}
-                  origin={vec(45, 51)}
-                >
+              <Group transform={[{ translateY: 2 }, { scaleY: 0.804 }]}>
+                <Group transform={[{ rotate: 0 }]} origin={vec(45, 51)}>
+                  {/* For the rotation, I will use the Math.PI * multiplier(starts from 0) */}
                   {/* The group here is where the rotation will happen. */}
-                  <Oval
-                    x={45}
-                    y={13}
-                    width={40}
-                    height={40}
-                    color="blue"
-                  ></Oval>
-                  <Oval
-                    x={4}
-                    y={10}
-                    width={82}
-                    height={82}
-                    color="orange"
-                  ></Oval>
+
+                  {/* Here are the light and the shadow of the top surface, I will have two ovals clipped
+                  by another oval. The cilp mask is defined outside of the component function*/}
+                  <Group clip={surfaceClip}>
+                    <Oval x={25} y={-10} width={80} height={80}>
+                      <RadialGradient
+                        c={vec(72, 23)}
+                        r={40}
+                        colors={["rgba(141,215,251,1)", "rgba(141,215,251,0)"]}
+                      />
+                    </Oval>
+                  </Group>
+                  {/* Lower Left */}
                   {highlightPathA && (
                     <Path
                       path={highlightPathA}
-                      transform={[{ rotate: Math.PI / 5 }]}
+                      transform={[{ rotate: Math.PI * (1 / 5) }]}
                       origin={vec(45, 51)}
-                      color="yellow"
+                      color="#FFF"
                     />
                   )}
+                  {/* Lower Right */}
                   {highlightPathB && (
                     <Path
                       path={highlightPathB}
-                      transform={[{ rotate: (Math.PI / 5) * -1 }]}
+                      transform={[{ rotate: Math.PI * -(1 / 4) }]}
                       origin={vec(45, 51)}
-                      color="yellow"
+                      color="#FFF"
                     />
                   )}
+                  {/* Top Right */}
+                  {highlightPathB && (
+                    <Path
+                      path={highlightPathB}
+                      transform={[{ rotate: Math.PI * -(3 / 4) }]}
+                      origin={vec(45, 51)}
+                      color="#FFF"
+                    />
+                  )}
+                  <Blur blur={1} />
                 </Group>
               </Group>
             </Group>
