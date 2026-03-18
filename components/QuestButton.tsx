@@ -16,6 +16,8 @@ import {
   vec,
   Blend,
   RadialGradient,
+  Mask,
+  Paint,
 } from "@shopify/react-native-skia";
 import Animated, {
   useDerivedValue,
@@ -142,15 +144,33 @@ export default function QuestButton({ onPress }: QuestButtonProps) {
 
                   {/* Here are the light and the shadow of the top surface, I will have two ovals clipped
                   by another oval. The cilp mask is defined outside of the component function*/}
-                  <Group clip={surfaceClip}>
-                    <Oval x={25} y={-10} width={80} height={80}>
+
+                  <Group layer={<Paint />}>
+                    {/* Content */}
+                    <Oval x={-45} y={25} width={120} height={120}>
                       <RadialGradient
-                        c={vec(72, 23)}
-                        r={40}
-                        colors={["rgba(141,215,251,1)", "rgba(141,215,251,0)"]}
+                        c={vec(12, 80)}
+                        r={60}
+                        colors={["rgba(0,100,199,0.6)", "rgba(0,100,199,0)"]}
                       />
                     </Oval>
+                    <Oval x={15} y={-10} width={130} height={130}>
+                      <RadialGradient
+                        c={vec(75, 20)}
+                        r={60}
+                        colors={[
+                          "rgba(141,215,251,0.4)",
+                          "rgba(141,215,251,0)",
+                        ]}
+                      />
+                    </Oval>
+
+                    {/* Soft mask — blurred white oval composited with dstIn */}
+                    <Group layer={<Paint blendMode="dstIn" />}>
+                      <Oval x={4} y={10} width={82} height={82} color="white" />
+                    </Group>
                   </Group>
+
                   {/* Lower Left */}
                   {highlightPathA && (
                     <Path
@@ -178,7 +198,7 @@ export default function QuestButton({ onPress }: QuestButtonProps) {
                       color="#FFF"
                     />
                   )}
-                  <Blur blur={1} />
+                  <Blur blur={1.5} />
                 </Group>
               </Group>
             </Group>
@@ -213,7 +233,6 @@ const styles = StyleSheet.create({
     marginHorizontal: 12,
     alignItems: "center",
     justifyContent: "flex-end",
-    backgroundColor: "#FF00004D",
   },
   button: {
     width: 90,
