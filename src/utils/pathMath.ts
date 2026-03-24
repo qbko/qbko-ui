@@ -5,7 +5,7 @@ export interface NodeLayout {
 }
 
 const SEGMENTS_PER_HUMP = 4;
-const MIN_ROW_HEIGHT = 90;
+const MIN_ROW_HEIGHT = 95;
 
 export function computeUnitLayout(
   totalLessons: number,

@@ -22,6 +22,8 @@ export function transformUnitsToLayout(units: RawUnit[]): HomeListItem[] {
       flattenedList.push({
         type: "button",
         id: lesson.id,
+        state: "current",
+        unitIndex: 0,
         lessonNumber: lesson.lessonNumber,
         offsetX: layout.offsetX,
         rowHeight: layout.rowHeight,

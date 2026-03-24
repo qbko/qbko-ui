@@ -27,7 +27,9 @@ const styles = StyleSheet.create({
     top: -160,
     width: 120,
     height: 160,
-    backgroundColor: "#00FFEE",
+    borderStyle: "dashed",
+    borderWidth: 1,
+    borderColor: "#C1C1C2",
     borderRadius: 8,
   },
 });
