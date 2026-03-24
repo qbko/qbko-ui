@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useCallback, useMemo } from "react";
 import { StyleSheet, View } from "react-native";
 import { FlashList } from "@shopify/flash-list";
 
@@ -19,6 +19,11 @@ export default function HomeScreen() {
     [], // Empty dependency means it runs once on mount
   );
 
+  //temporary function
+  const handlePress = useCallback(() => {
+    console.log("button pressed");
+  }, []);
+
   const renderListItem = ({ item }: { item: HomeListItem }) => {
     switch (item.type) {
       case "divider":
@@ -35,7 +40,11 @@ export default function HomeScreen() {
               },
             ]}
           >
-            <QuestButton onPress={() => console.log(`${item.id}`)} />
+            <QuestButton
+              state={item.state}
+              unitIndex={item.unitIndex}
+              onPress={handlePress}
+            />
           </View>
         );
 

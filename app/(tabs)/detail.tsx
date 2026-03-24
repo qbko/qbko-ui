@@ -8,7 +8,7 @@ export default function DetailScreen() {
 
   return (
     <View style={styles.container}>
-      <QuestButton onPress={handlePress} />
+      <QuestButton state={"current"} unitIndex={0} onPress={handlePress} />
     </View>
   );
 }

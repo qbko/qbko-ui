@@ -1,3 +1,4 @@
+import React from "react";
 import {
   View,
   StyleSheet,
@@ -28,17 +29,34 @@ import Animated, {
   Easing,
   ReduceMotion,
 } from "react-native-reanimated";
+import { getQuestButtonTheme } from "../src/constants/questButtonThemes";
+import { QuestButtonState } from "../src/types/questButton";
 
 interface QuestButtonProps {
+  state: QuestButtonState;
+  unitIndex: number;
   onPress: () => void;
 }
 
-// For the highlight, top surface light and shadow
-// Declaring the clipping mask for the top surface here
-const ovalMask = { x: 4, y: 10, width: 82, height: 82 };
-const surfaceClip = Skia.Path.Make().addOval(ovalMask);
+// I will make the highlight shapes as paths here
 
-export default function QuestButton({ onPress }: QuestButtonProps) {
+const xOffsetA = 20;
+const yOffsetA = 88;
+//Bigger hightlight
+const highlightPathA = Skia.Path.MakeFromSVGString(
+  `M ${0 + xOffsetA} ${0 + yOffsetA} C ${0 + xOffsetA} ${0 + yOffsetA} ${11.92 + xOffsetA} ${7 + yOffsetA} ${25.3 + xOffsetA} ${7 + yOffsetA} S ${50.6 + xOffsetA} ${0 + yOffsetA} ${50.6 + xOffsetA} ${0 + yOffsetA} C ${43.45 + xOffsetA} ${5.04 + yOffsetA} ${34.72 + xOffsetA} ${9 + yOffsetA} ${25.3 + xOffsetA} ${9 + yOffsetA} S ${7.15 + xOffsetA} ${5.04 + yOffsetA} ${0 + xOffsetA} ${0 + yOffsetA} Z`,
+);
+const xOffsetB = 28;
+const yOffsetB = 92;
+// Smaller highlight
+const highlightPathB = Skia.Path.MakeFromSVGString(
+  `M ${0 + xOffsetB} ${0 + yOffsetB} C ${0 + xOffsetB} ${0 + yOffsetB} ${7.42 + xOffsetB} ${2.82 + yOffsetB} ${17.95 + xOffsetB} ${2.82 + yOffsetB} S ${35.9 + xOffsetB} ${0 + yOffsetB} ${35.9 + xOffsetB} ${0 + yOffsetB} C ${30.42 + xOffsetB} ${2.46 + yOffsetB} ${24.34 + xOffsetB} ${4.73 + yOffsetB} ${17.95 + xOffsetB} ${4.73 + yOffsetB} S ${5.48 + xOffsetB} ${2.46 + yOffsetB} ${0 + xOffsetB} ${0 + yOffsetB} Z`,
+);
+
+function QuestButton({ state, unitIndex, onPress }: QuestButtonProps) {
+  //get the correct color combinations
+  const theme = getQuestButtonTheme(state, unitIndex);
+
   const pressedOffset = useSharedValue(0);
 
   //Note: in order to accommodate the overshoot of the button on release, I increased
@@ -65,31 +83,17 @@ export default function QuestButton({ onPress }: QuestButtonProps) {
     return path;
   });
 
-  // I will make the highlight shapes as paths here
-
-  const xOffsetA = 20;
-  const yOffsetA = 88;
-  //Bigger hightlight
-  const highlightPathA = Skia.Path.MakeFromSVGString(
-    `M ${0 + xOffsetA} ${0 + yOffsetA} C ${0 + xOffsetA} ${0 + yOffsetA} ${11.92 + xOffsetA} ${7 + yOffsetA} ${25.3 + xOffsetA} ${7 + yOffsetA} S ${50.6 + xOffsetA} ${0 + yOffsetA} ${50.6 + xOffsetA} ${0 + yOffsetA} C ${43.45 + xOffsetA} ${5.04 + yOffsetA} ${34.72 + xOffsetA} ${9 + yOffsetA} ${25.3 + xOffsetA} ${9 + yOffsetA} S ${7.15 + xOffsetA} ${5.04 + yOffsetA} ${0 + xOffsetA} ${0 + yOffsetA} Z`,
-  );
-  const xOffsetB = 28;
-  const yOffsetB = 92;
-  // Smaller highlight
-  const highlightPathB = Skia.Path.MakeFromSVGString(
-    `M ${0 + xOffsetB} ${0 + yOffsetB} C ${0 + xOffsetB} ${0 + yOffsetB} ${7.42 + xOffsetB} ${2.82 + yOffsetB} ${17.95 + xOffsetB} ${2.82 + yOffsetB} S ${35.9 + xOffsetB} ${0 + yOffsetB} ${35.9 + xOffsetB} ${0 + yOffsetB} C ${30.42 + xOffsetB} ${2.46 + yOffsetB} ${24.34 + xOffsetB} ${4.73 + yOffsetB} ${17.95 + xOffsetB} ${4.73 + yOffsetB} S ${5.48 + xOffsetB} ${2.46 + yOffsetB} ${0 + xOffsetB} ${0 + yOffsetB} Z`,
-  );
-
   //This is for the Group, the top surface of the button
   const groupTransform = useDerivedValue(() => [
     { translateY: pressedOffset.value },
   ]);
+
   //This is for the Rive container, that is inside the top surface of the button
-  const riveSurfaceTransform = useAnimatedStyle(() => {
-    return {
-      transform: [{ translateY: pressedOffset.value }],
-    };
-  });
+  // const riveSurfaceTransform = useAnimatedStyle(() => {
+  //   return {
+  //     transform: [{ translateY: pressedOffset.value }],
+  //   };
+  // });
 
   //Below is for the animation fine tuning
   const releaseHandling = (event: GestureResponderEvent) => {
@@ -120,20 +124,20 @@ export default function QuestButton({ onPress }: QuestButtonProps) {
   return (
     <View style={styles.buttonContainer}>
       <View style={styles.button}>
-        <Canvas style={{ width: 90, height: 90 }}>
-          <Path path={animatedPath} color={"#0064C7"} />
+        <Canvas style={styles.canvas}>
+          <Path path={animatedPath} color={theme.dark} />
           <Group clip={animatedPath}>
             {/* Here is the top of the button */}
-            <Rect x={44} y={36} width={50} height={100} color="red">
+            <Rect x={44} y={36} width={50} height={100}>
               <LinearGradient
                 start={vec(44, 50)}
                 end={vec(100, 50)}
-                colors={["#0064C7", "#023C71", "#0064C7"]}
+                colors={[...theme.sideShadow]}
                 positions={[0, 0.4, 1]}
               />
             </Rect>
             <Group transform={groupTransform}>
-              <Oval x={1} y={8} width={88} height={72} color="#0080FF">
+              <Oval x={1} y={8} width={88} height={72} color={theme.base}>
                 <Blur blur={1} />
               </Oval>
               {/* Don't forget about the scaleY { scaleY: 0.804 } */}
@@ -151,23 +155,26 @@ export default function QuestButton({ onPress }: QuestButtonProps) {
                       <RadialGradient
                         c={vec(12, 80)}
                         r={60}
-                        colors={["rgba(0,100,199,0.6)", "rgba(0,100,199,0)"]}
+                        colors={[...theme.surfaceOne]}
                       />
                     </Oval>
                     <Oval x={15} y={-10} width={130} height={130}>
                       <RadialGradient
                         c={vec(75, 20)}
                         r={60}
-                        colors={[
-                          "rgba(141,215,251,0.4)",
-                          "rgba(141,215,251,0)",
-                        ]}
+                        colors={[...theme.surfaceTwo]}
                       />
                     </Oval>
 
                     {/* Soft mask — blurred white oval composited with dstIn */}
                     <Group layer={<Paint blendMode="dstIn" />}>
-                      <Oval x={4} y={10} width={82} height={82} color="white" />
+                      <Oval
+                        x={4}
+                        y={10}
+                        width={82}
+                        height={82}
+                        color={theme.highlight}
+                      />
                     </Group>
                   </Group>
 
@@ -177,7 +184,7 @@ export default function QuestButton({ onPress }: QuestButtonProps) {
                       path={highlightPathA}
                       transform={[{ rotate: Math.PI * (1 / 5) }]}
                       origin={vec(45, 51)}
-                      color="#FFF"
+                      color={theme.highlight}
                     />
                   )}
                   {/* Lower Right */}
@@ -186,7 +193,7 @@ export default function QuestButton({ onPress }: QuestButtonProps) {
                       path={highlightPathB}
                       transform={[{ rotate: Math.PI * -(1 / 4) }]}
                       origin={vec(45, 51)}
-                      color="#FFF"
+                      color={theme.highlight}
                     />
                   )}
                   {/* Top Right */}
@@ -195,7 +202,7 @@ export default function QuestButton({ onPress }: QuestButtonProps) {
                       path={highlightPathB}
                       transform={[{ rotate: Math.PI * -(3 / 4) }]}
                       origin={vec(45, 51)}
-                      color="#FFF"
+                      color={theme.highlight}
                     />
                   )}
                   <Blur blur={1.5} />
@@ -226,6 +233,8 @@ export default function QuestButton({ onPress }: QuestButtonProps) {
   );
 }
 
+export default React.memo(QuestButton);
+
 const styles = StyleSheet.create({
   buttonContainer: {
     width: 90,
@@ -240,6 +249,10 @@ const styles = StyleSheet.create({
     paddingBlock: 2,
     position: "relative",
     justifyContent: "flex-end",
+  },
+  canvas: {
+    width: 90,
+    height: 90,
   },
   riveContainer: {
     position: "absolute",

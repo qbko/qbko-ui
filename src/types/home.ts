@@ -1,3 +1,4 @@
+import { QuestButtonState } from "./questButton";
 import { NodeLayout } from "../utils/pathMath";
 
 // RAW DATA LAYER, this is what we are getting from the Database
@@ -17,9 +18,11 @@ export interface RawUnit {
 // VIEW LAYER
 // What the flashlist actually renders
 
-export interface ButtonNode extends NodeLayout {
+export interface QuestButtonNode extends NodeLayout {
   type: "button";
   id: string;
+  state: QuestButtonState;
+  unitIndex: number;
   lessonNumber: number;
 }
 
@@ -37,4 +40,4 @@ export interface CharacterNode {
 }
 
 // The Union Type for the Flashlist
-export type HomeListItem = ButtonNode | DividerNode | CharacterNode;
+export type HomeListItem = QuestButtonNode | DividerNode | CharacterNode;
